@@ -7,13 +7,14 @@ import yaml
 import os
 from os.path import dirname, abspath
 
-rootDirectory    = dirname(abspath(__file__))
+rootDirectory = dirname(abspath(__file__))
 datasetDirectory = os.path.join(rootDirectory, "Dataset")
-imgDirectory     = os.path.join(datasetDirectory, "images")
-maskDirectory    = os.path.join(datasetDirectory, "annotations")
+imgDirectory = os.path.join(datasetDirectory, "images")
+maskDirectory = os.path.join(datasetDirectory, "annotations")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-exp', type=str, default='DefaultExp')
+
 
 def main(args):
     # --- 0) read yaml config (absolute path)
@@ -44,6 +45,7 @@ def main(args):
     # --- 4) eval
     myNetwork.loadWeights()
     myNetwork.evaluate()
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
