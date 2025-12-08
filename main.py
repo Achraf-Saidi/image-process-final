@@ -1,6 +1,6 @@
 # main.py
-from Networks.model import *
-from Dataset.makeGraph import *
+import Networks.model as model
+import Networks.ssl_model as ssl
 
 import argparse
 import yaml
@@ -14,10 +14,11 @@ maskDirectory = os.path.join(datasetDirectory, "annotations")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-exp', type=str, default='DefaultExp')
+parser.add_argument('-ssl', action='store_true')
 
 
 def main(args):
-    # --- 0) read yaml config (absolute path)
+    # --- 0) Read yaml config (absolute path)
     yaml_path = os.path.join(rootDirectory, "Todo_List", f"{args.exp}.yaml")
     if not os.path.exists(yaml_path):
         raise FileNotFoundError(f"YAML not found: {yaml_path}")
@@ -27,22 +28,18 @@ def main(args):
 
     resultsPath = os.path.join(rootDirectory, "Results", args.exp)
 
-    # --- 1) network
-    myNetwork = Network_Class(param, imgDirectory, maskDirectory, resultsPath)
+    # --- 1) Instantiate network
+    if args.ssl:
+        myNetwork = ssl.Network_Class(param, imgDirectory, maskDirectory, resultsPath)
+    else:
+        myNetwork = model.Network_Class(param, imgDirectory, maskDirectory, resultsPath)
 
-    # --- 2) dataset viz optional (controlled by YAML)
-    if bool(param.get("SHOW_DATASET", True)):
-        try:
-            showDataset(myNetwork.dataSetTrain, param)
-        except Exception as e:
-            print(f"[WARN] showDataset skipped: {e}")
-
-    # --- 3) train
+    # --- 2) Train
     print("Start to train the network")
     myNetwork.train()
     print("The network is trained")
 
-    # --- 4) eval
+    # --- 3) Evaluation
     myNetwork.loadWeights()
     myNetwork.evaluate()
 
